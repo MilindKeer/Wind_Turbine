@@ -1,0 +1,152 @@
+2025-02-11 23:18:05 - INFO - Starting Wind Turbine Data Pipeline...
+2025-02-11 23:18:05 - INFO - Starting: Database Setup
+2025-02-11 23:18:05 - INFO - Wind Turbine - Databse Setup Starts
+2025-02-11 23:18:05 - INFO - Database 'wind_turbine_db' already exists.
+2025-02-11 23:18:05 - INFO - get DB connection
+2025-02-11 23:18:05 - INFO - Table - wind_turbine_raw_data is either exist or created successfully
+2025-02-11 23:18:05 - INFO - Table - wind_turbine_ingestion_tracker is either exist or created successfully
+2025-02-11 23:18:05 - INFO - Table - wind_turbine_clean_data is either exist or created successfully
+2025-02-11 23:18:05 - INFO - Table - wind_turbine_anomalies is either exist or created successfully
+2025-02-11 23:18:06 - INFO - Table - wind_turbine_mean_median_mode_stats is either exist or created successfully
+2025-02-11 23:18:06 - INFO - Table - wind_turbine_summary_stats is either exist or created successfully
+2025-02-11 23:18:06 - INFO - DB Connection closed.
+2025-02-11 23:18:06 - INFO - MySQL Connection closed.
+2025-02-11 23:18:06 - INFO - DB mysql_connection closed.
+2025-02-11 23:18:06 - INFO - Completed: Database Setup
+2025-02-11 23:18:06 - INFO - Starting: Data Ingestion
+2025-02-11 23:18:06 - INFO - main function called....
+2025-02-11 23:18:06 - INFO - Wind Turbine - Data ingestion Starts
+2025-02-11 23:18:06 - INFO - ingest_all_csvs function called....
+2025-02-11 23:18:06 - INFO - CSV file: data_group_1.csv processing starts
+2025-02-11 23:18:06 - INFO - ingest_csv function called....
+2025-02-11 23:18:06 - INFO - get_last_processed_info function called....
+2025-02-11 23:18:06 - INFO - Last record from previous load: None
+2025-02-11 23:18:06 - INFO - last_csv_processed_info: None
+2025-02-11 23:18:06 - INFO - Processing new data 3720 new rows for data/raw_data\data_group_1.csv
+2025-02-11 23:18:12 - INFO - Data load (3720 records) for data/raw_data\data_group_1.csv is Successful
+2025-02-11 23:18:12 - INFO - update_wind_turbine_ingestion_tracker function called....
+2025-02-11 23:18:12 - INFO - Table wind_turbine_ingestion_tracker updated
+2025-02-11 23:18:12 - INFO - move_csv_to_archive function called....
+2025-02-11 23:18:12 - INFO - data/raw_data\data_group_1.csv moved to Archive folder
+2025-02-11 23:18:12 - INFO - CSV file: data_group_1.csv processing ends
+2025-02-11 23:18:12 - INFO - CSV file: data_group_2.csv processing starts
+2025-02-11 23:18:12 - INFO - ingest_csv function called....
+2025-02-11 23:18:12 - INFO - get_last_processed_info function called....
+2025-02-11 23:18:12 - INFO - Last record from previous load: None
+2025-02-11 23:18:12 - INFO - last_csv_processed_info: None
+2025-02-11 23:18:12 - INFO - Processing new data 3720 new rows for data/raw_data\data_group_2.csv
+2025-02-11 23:18:17 - INFO - Data load (3720 records) for data/raw_data\data_group_2.csv is Successful
+2025-02-11 23:18:17 - INFO - update_wind_turbine_ingestion_tracker function called....
+2025-02-11 23:18:17 - INFO - Table wind_turbine_ingestion_tracker updated
+2025-02-11 23:18:17 - INFO - move_csv_to_archive function called....
+2025-02-11 23:18:17 - INFO - data/raw_data\data_group_2.csv moved to Archive folder
+2025-02-11 23:18:17 - INFO - CSV file: data_group_2.csv processing ends
+2025-02-11 23:18:17 - INFO - CSV file: data_group_3.csv processing starts
+2025-02-11 23:18:17 - INFO - ingest_csv function called....
+2025-02-11 23:18:17 - INFO - get_last_processed_info function called....
+2025-02-11 23:18:17 - INFO - Last record from previous load: None
+2025-02-11 23:18:17 - INFO - last_csv_processed_info: None
+2025-02-11 23:18:18 - INFO - Processing new data 3720 new rows for data/raw_data\data_group_3.csv
+2025-02-11 23:18:23 - INFO - Data load (3720 records) for data/raw_data\data_group_3.csv is Successful
+2025-02-11 23:18:23 - INFO - update_wind_turbine_ingestion_tracker function called....
+2025-02-11 23:18:23 - INFO - Table wind_turbine_ingestion_tracker updated
+2025-02-11 23:18:23 - INFO - move_csv_to_archive function called....
+2025-02-11 23:18:23 - INFO - data/raw_data\data_group_3.csv moved to Archive folder
+2025-02-11 23:18:23 - INFO - CSV file: data_group_3.csv processing ends
+2025-02-11 23:18:23 - INFO - DB connection closed.
+2025-02-11 23:18:23 - INFO - Completed: Data Ingestion
+2025-02-11 23:18:23 - INFO - Starting: Data Cleaning
+2025-02-11 23:18:23 - INFO - Wind Turbine - Data Cleaning Process Starts
+2025-02-11 23:18:23 - INFO - Step 1 - get DB connection
+2025-02-11 23:18:23 - INFO - MySQL DB connection is successful.
+2025-02-11 23:18:23 - INFO - Step 2 - Detect & Store anomalies
+2025-02-11 23:18:23 - INFO - detect_and_store_anomalies function called
+2025-02-11 23:18:23 - INFO - Using wind_turbine_raw_data to calculate AVG and STD values
+2025-02-11 23:18:23 - INFO - mean_power: 3.0277329744831207
+2025-02-11 23:18:23 - INFO - mean_power: 1.2069551485571886
+2025-02-11 23:18:23 - INFO - lower_bound: 0.6138226773687436
+2025-02-11 23:18:23 - INFO - upper_bound: 5.441643271597497
+2025-02-11 23:18:23 - INFO - anomalies_table_row_count: 0
+2025-02-11 23:18:23 - INFO - max_timestamp of previous clean data run: None
+2025-02-11 23:18:23 - INFO - Skipping timestamp filter for anomalies data insertion (first time run or table empty).
+2025-02-11 23:18:23 - INFO - insert_anomalies_query: 
+                    INSERT INTO wind_turbine_anomalies (timestamp, turbine_id, wind_speed, wind_direction, power_output)
+                    SELECT timestamp, turbine_id, wind_speed, wind_direction, power_output
+                        FROM wind_turbine_raw_data
+                        WHERE power_output < %s OR power_output > %s
+                        ON DUPLICATE KEY UPDATE 
+                            wind_speed = VALUES(wind_speed),
+                            wind_direction = VALUES(wind_direction),
+                            power_output = VALUES(power_output),
+                            insertion_date = CURRENT_TIMESTAMP;
+                    
+2025-02-11 23:18:24 - INFO - anomalies detected and stored successfully.
+2025-02-11 23:18:24 - INFO - Step 3 - Process Statistics i.e. process and store stats for different period
+2025-02-11 23:18:24 - INFO - process_stat function called....
+2025-02-11 23:18:24 - INFO - get_filtered_data function called....
+2025-02-11 23:18:24 - INFO - period_start: None
+2025-02-11 23:18:24 - INFO - calculate_statistics function called....
+2025-02-11 23:18:24 - INFO - store_statistics function called
+2025-02-11 23:18:24 - INFO - get_filtered_data function called....
+2025-02-11 23:18:24 - INFO - period_start: 2022-03-03 23:00:00
+2025-02-11 23:18:24 - INFO - calculate_statistics function called....
+2025-02-11 23:18:24 - INFO - store_statistics function called
+2025-02-11 23:18:24 - INFO - get_filtered_data function called....
+2025-02-11 23:18:24 - INFO - period_start: 2022-03-17 23:00:00
+2025-02-11 23:18:24 - INFO - calculate_statistics function called....
+2025-02-11 23:18:24 - INFO - store_statistics function called
+2025-02-11 23:18:24 - INFO - get_filtered_data function called....
+2025-02-11 23:18:24 - INFO - period_start: 2022-03-24 23:00:00
+2025-02-11 23:18:24 - INFO - calculate_statistics function called....
+2025-02-11 23:18:24 - INFO - store_statistics function called
+2025-02-11 23:18:24 - INFO - get_filtered_data function called....
+2025-02-11 23:18:24 - INFO - period_start: 2022-03-30 23:00:00
+2025-02-11 23:18:24 - INFO - calculate_statistics function called....
+2025-02-11 23:18:24 - INFO - store_statistics function called
+2025-02-11 23:18:24 - INFO - Step 4 - Update clean data table for missing values
+2025-02-11 23:18:24 - INFO - update_clean_table function called....
+2025-02-11 23:18:24 - INFO - update_clean_table query: 
+            INSERT IGNORE INTO wind_turbine_clean_data (timestamp, turbine_id, wind_speed, wind_direction, power_output)
+            SELECT 
+                timestamp, turbine_id, 
+                COALESCE(wind_speed, (
+                    SELECT wind_speed_median 
+                    FROM wind_turbine_mean_median_mode_stats 
+                    WHERE period= 'full_dataset'
+                    ORDER BY calculation_timestamp DESC 
+                    LIMIT 1
+                    )),  
+                COALESCE(wind_direction, (
+                    SELECT wind_direction_median 
+                    FROM wind_turbine_mean_median_mode_stats 
+                    WHERE period= 'full_dataset'
+                    ORDER BY calculation_timestamp DESC 
+                    LIMIT 1
+                    )),  
+                COALESCE(power_output, (
+                    SELECT power_output_mean 
+                    FROM wind_turbine_mean_median_mode_stats 
+                    WHERE period= 'full_dataset'
+                    ORDER BY calculation_timestamp DESC 
+                    LIMIT 1
+                    ))     
+            FROM wind_turbine_raw_data r
+            WHERE NOT EXISTS (
+                SELECT 1 FROM wind_turbine_anomalies o
+                WHERE r.timestamp = o.timestamp
+                AND r.turbine_id = o.turbine_id
+            );
+            
+2025-02-11 23:18:25 - INFO - Clean data updated successfully
+2025-02-11 23:18:25 - INFO - DB Connection closed.
+2025-02-11 23:18:25 - INFO - Completed: Data Cleaning
+2025-02-11 23:18:25 - INFO - Starting: Summary Statistics Calculation
+2025-02-11 23:18:25 - INFO - Wind Turbine - calculate summary stats starts
+2025-02-11 23:18:25 - INFO - Step 1 - get DB connection
+2025-02-11 23:18:26 - INFO - MySQL DB connection is successful.
+2025-02-11 23:18:26 - INFO - Step 2 - calculate summary stats
+2025-02-11 23:18:26 - INFO - calculate_summary_stats is successful
+2025-02-11 23:18:26 - INFO - get_anomalies_summary_stats is successful
+2025-02-11 23:18:26 - INFO - DB Connection closed.
+2025-02-11 23:18:26 - INFO - Completed: Summary Statistics Calculation
+2025-02-11 23:18:26 - INFO - Pipeline completed successfully.

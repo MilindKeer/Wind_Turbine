@@ -1,4 +1,37 @@
+const fs = require('fs');
+const path = require('path');
 
+// Function to get folder structure
+function getFolderStructure(dirPath) {
+  let structure = '';
+  const files = fs.readdirSync(dirPath); // Get the list of files/folders in the directory
+
+  files.forEach(file => {
+    const fullPath = path.join(dirPath, file);  // Full path to the file or folder
+    const stats = fs.statSync(fullPath); // Get file stats (whether it's a directory or a file)
+
+    if (stats.isDirectory()) {
+      structure += `- **${file}**/\n`;  // Add directory with a slash
+      structure += getFolderStructure(fullPath); // Recursively add subfolders
+    } else {
+      structure += `  - ${file}\n`;  // Add file (without a slash)
+    }
+  });
+
+  return structure;
+}
+
+// Directory to start with (current directory in this case)
+const dirPath = __dirname;  // This refers to the current directory
+
+// Get the folder structure starting from the current directory
+const folderStructure = getFolderStructure(dirPath);
+
+// for folder structure
+// ${folderStructure}
+
+// Full content for the README.md file
+const readmeContent = `
 # Wind Turbine Data Pipeline
 
 
@@ -32,48 +65,48 @@ You are a data engineer for a renewable energy company that operates a farm of w
 To install this project, follow these steps:
 
 1. Clone this repository:
-   ```
+   \`\`\`
    git clone https://github.com/MilindKeer/Colibri_Digital
-   ```
+   \`\`\`
 
 2. Navigate into the project directory e.g.:
-   ```
+   \`\`\`
    cd WIND_TURBINE
-   ```
+   \`\`\`
 
 3. Install the required dependencies:
 
     Run the following command to install required packages:
-    ```
+    \`\`\`
       bash
       pip install -r requirements.txt
-    ```
+    \`\`\`
     
     OR use the provided script:
 
-    ```
+    \`\`\`
     bash
     python install_packages.py
-    ```
+    \`\`\`
   
     Also, Make sure you have MySQL installed, 
     Open src/config file from the project and update MySQL connection details
     
     e.g.
-    ```
+    \`\`\`
     Database Credentials
     DB_HOST = "localhost"
     DB_PORT = 3306
     DB_USER = "milind"  # Replace with your MySQL username
     DB_PASSWORD = "password@123"  # Replace with your MySQL password
     DB_NAME = "wind_turbine_db"
-    ```
+    \`\`\`
 
     Source files: source CSV files should be stored at
-    ```
+    \`\`\`
     /data/raw_data/
     
-    ```
+    \`\`\`
 
 ## Usage
 
@@ -81,15 +114,15 @@ Ensure that you have the necessary environment variables set up (if any e.g. DB 
 before running the project.
 
 To run the data pipeline, go to the project path and run the following command:
-```
+\`\`\`
 Python data_pipeline/wind_turbine_data_pipeline.py
-```
+\`\`\`
 
 ## Folder Structure
 
 The folder structure of this project is as follows:
 
-```
+\`\`\`
 - data/
 - archive/
   - 20250211_231812_data_group_1.csv
@@ -119,44 +152,44 @@ The folder structure of this project is as follows:
 - generate-folder-structure.js
 - READMe.md
 - requirements.txt
-```
+\`\`\`
 
 ## **Detailed Workflow**
 
-### **Data Ingestion (`ingest_data.py`)**  
-- Reads all CSV files from `data/raw/` and loads them into the **Raw Data Table (`wind_turbine_raw_data`)**.  
+### **Data Ingestion (\`ingest_data.py\`)**  
+- Reads all CSV files from \`data/raw/\` and loads them into the **Raw Data Table (\`wind_turbine_raw_data\`)**.  
 - The **Raw Data Table** acts as the **source of truth**, storing data exactly as it appears in the CSV files without modifications.  
-- Tracks ingestion using an **Ingestion Tracker Table (`wind_turbine_ingestion_tracker`)**:  
+- Tracks ingestion using an **Ingestion Tracker Table (\`wind_turbine_ingestion_tracker\`)**:  
   - Captures the **last processed timestamp** and **row number per file**.  
   - Ensures **only new data** is read in subsequent runs, significantly improving **scalability**.  
     - This approach reduces **redundant processing**, ensuring that as data volume grows, **only incremental records** are ingested, minimizing storage and computational overhead.  
     - Enables **efficient handling of large datasets**, as older records are not reprocessed, optimizing resource utilization.  
-- Moves processed CSVs to `data/archive/` with a timestamped filename (e.g., `20250211_231812_data_group_1.csv`).  
+- Moves processed CSVs to \`data/archive/\` with a timestamped filename (e.g., \`20250211_231812_data_group_1.csv\`).  
 - Designed to **scale efficiently** as more turbines and larger datasets are introduced.  
 
-### **Data Cleaning (`clean_data.py`)**
+### **Data Cleaning (\`clean_data.py\`)**
 - Identifies and removes **outliers/anomalies** based on mean & standard deviation (i.e turbines whose output is outside of 2 standard deviations from the mean).
-- Stores anomalies separately in an **Anomalies Table (`wind_turbine_anomalies`)**.
-- Computes **mean, median, and mode** for `wind_speed`, `wind_direction`, and `power_output` over multiple periods:
+- Stores anomalies separately in an **Anomalies Table (\`wind_turbine_anomalies\`)**.
+- Computes **mean, median, and mode** for \`wind_speed\`, \`wind_direction\`, and \`power_output\` over multiple periods:
   - Full dataset
   - Last 4 weeks 
   - 2 weeks 
   - 1 week
   - 1 day
-- Stores above in the **Mean Median Mode table (`wind_turbine_mean_median_mode_stats`) **  
+- Stores above in the **Mean Median Mode table (\`wind_turbine_mean_median_mode_stats\`) **  
 - Uses these statistics to **impute missing values** in the cleaned dataset (currently handles only missing values but logic can be extended to handle for other invalid data e.g. negative values).
 - Ensures the **Clean Data Table** is free of missing values and anomolies are removed.
-- Updates **Clean Data Table (`wind_turbine_clean_data`) **
+- Updates **Clean Data Table (\`wind_turbine_clean_data\`) **
 
-### **Summary Statistics (`calculate_summary_stats.py`)**
-- Computes **minimum, maximum, and average power output per turbine per day** and stores in **stats table (`wind_turbine_summary_stats`)**.
-- Generates a **daily anomaly count per turbine** and store in a **stats table (`wind_turbine_anomalies_summary_stats`)**
+### **Summary Statistics (\`calculate_summary_stats.py\`)**
+- Computes **minimum, maximum, and average power output per turbine per day** and stores in **stats table (\`wind_turbine_summary_stats\`)**.
+- Generates a **daily anomaly count per turbine** and store in a **stats table (\`wind_turbine_anomalies_summary_stats\`)**
 
 ---
 
 ## **Database Schema Overview**
 
-### **Raw Data Table (`wind_turbine_raw_data`)**
+### **Raw Data Table (\`wind_turbine_raw_data\`)**
 | Column | Type | Description |
 |--------|------|-------------|
 | id | INT | Primary key |
@@ -166,10 +199,10 @@ The folder structure of this project is as follows:
 | wind_direction | FLOAT | Wind direction measurement |
 | power_output | FLOAT | Power output in MW |
 
-**Unique Key**: The combination of `turbine_id` + `timestamp` serve as unique identifiers for each data record.
+**Unique Key**: The combination of \`turbine_id\` + \`timestamp\` serve as unique identifiers for each data record.
 
 
-### **Ingestion Tracker Table (`wind_turbine_ingestion_tracker`)**
+### **Ingestion Tracker Table (\`wind_turbine_ingestion_tracker\`)**
 | Column | Type | Description |
 |--------|------|-------------|
 | id | INT | Primary key |
@@ -179,7 +212,7 @@ The folder structure of this project is as follows:
 | data_insertion_date | DATETIME | data insertion date |
 
 
-### **Clean Data Table (`wind_turbine_clean_data`)**
+### **Clean Data Table (\`wind_turbine_clean_data\`)**
 Same as **Raw Data Table**, but with **missing values imputed** and **anomalies removed**.
 
 | Column | Type | Description |
@@ -191,10 +224,10 @@ Same as **Raw Data Table**, but with **missing values imputed** and **anomalies 
 | wind_direction | FLOAT | Wind direction measurement |
 | power_output | FLOAT | Power output in MW |
 
-**Unique Key**: The combination of `turbine_id` + `timestamp` serve as unique identifiers for each data record.
+**Unique Key**: The combination of \`turbine_id\` + \`timestamp\` serve as unique identifiers for each data record.
 
 
-### **Anomalies Table (`wind_turbine_anomalies`)**
+### **Anomalies Table (\`wind_turbine_anomalies\`)**
 Same as **Raw Data Table**, but contains only identified **anomalies**.
 
 | Column | Type | Description |
@@ -206,9 +239,9 @@ Same as **Raw Data Table**, but contains only identified **anomalies**.
 | wind_direction | FLOAT | Wind direction measurement |
 | power_output | FLOAT | Power output in MW |
 
-**Unique Key**: The combination of `turbine_id` + `timestamp` serve as unique identifiers for each data record.
+**Unique Key**: The combination of \`turbine_id\` + \`timestamp\` serve as unique identifiers for each data record.
 
-### **Mean, Median, Mode Table (`wind_turbine_mean_median_mode_stats`)**
+### **Mean, Median, Mode Table (\`wind_turbine_mean_median_mode_stats\`)**
 | Column | Type | Description |
 |--------|------|-------------|
 | id | INT (AUTO_INCREMENT) | Primary key |
@@ -225,7 +258,7 @@ Same as **Raw Data Table**, but contains only identified **anomalies**.
 | calculation_timestamp | TIMESTAMP | Record insertion time (default: current timestamp) |
 
 
-### **Summary Table (`wind_turbine_summary_stats`)**
+### **Summary Table (\`wind_turbine_summary_stats\`)**
 | Column          | Type     | Description                              |
 |----------------|---------|------------------------------------------|
 | day           | DATE     | Summary date (part of unique key)       |
@@ -233,11 +266,11 @@ Same as **Raw Data Table**, but contains only identified **anomalies**.
 | min_power_output | FLOAT   | Minimum power output                     |
 | max_power_output | FLOAT   | Maximum power output                     |
 | avg_power_output | FLOAT   | Average power output                     |
-| insertion_date | DATETIME | Timestamp when the record was inserted (default: `CURRENT_TIMESTAMP`) |
+| insertion_date | DATETIME | Timestamp when the record was inserted (default: \`CURRENT_TIMESTAMP\`) |
 
-**Unique Key**: The combination of `day` and `turbine_id` ensures that each turbine has only one summary record per day.
+**Unique Key**: The combination of \`day\` and \`turbine_id\` ensures that each turbine has only one summary record per day.
 
-### **Anomalies Summary Table (`wind_turbine_anomalies_summary`)**
+### **Anomalies Summary Table (\`wind_turbine_anomalies_summary\`)**
 | Column      | Type  | Description |
 |------------|------|-------------|
 | day        | DATE  | Summary date (part of unique key) |
@@ -247,17 +280,17 @@ Same as **Raw Data Table**, but contains only identified **anomalies**.
 | turbine_id_n | INT  | Number of anomalies for Turbine N |
 
 ## **Testing & Validation**
-### **Unit Tests (`tests/`)**
-- **`test_wind_turbone.py`** – Unit Test Script
+### **Unit Tests (\`tests/\`)**
+- **\`test_wind_turbone.py\`** – Unit Test Script
 
 Run tests using:
-```bash
+\`\`\`bash
 pytest unite_test/test_wind_turbone.py
-```
+\`\`\`
 
 ---
 
-## **Configuration (`config.py`)**
+## **Configuration (\`config.py\`)**
 This file defines **global variables** such as:
 - Database Credentials
 - Source Data CSV Prefix
@@ -270,7 +303,7 @@ This file defines **global variables** such as:
 ---
 
 ## **Key Assumptions**
-- Each turbine's data is always in the same CSV (e.g., `data_group_1.csv`). If this changes, the code needs to handle it appropriately.
+- Each turbine's data is always in the same CSV (e.g., \`data_group_1.csv\`). If this changes, the code needs to handle it appropriately.
 - All CSV files are expected to have the same last timestamp. If timestamps vary across files, the ingestion logic must account for this.
 - CSVs contain historical data; **only new rows are ingested**, ensuring efficient scaling as data volume grows.
 - The **Raw Data Table is the source of truth**, and data is loaded exactly as it appears in the CSV files. **Historical data will never change**.
@@ -288,3 +321,10 @@ For any questions, reach out at [technoacelimited@gmail.com](mailto:technoacelim
 > **Author**: Milind Keer  
 > **Version**: 1.0  
 
+`;
+
+
+// Write the README content to the file
+fs.writeFileSync('README.md', readmeContent, 'utf8');
+
+console.log('README.md file has been generated!');
