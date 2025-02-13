@@ -1,0 +1,12 @@
+2025-02-13 21:08:22 - INFO - Wind Turbine - calculate summary stats starts 
+
+2025-02-13 21:08:22 - INFO - Step 1 - get DB connection
+2025-02-13 21:08:23 - INFO - MySQL DB connection is successful.
+2025-02-13 21:08:23 - INFO - Step 2 - calculate summary stats
+2025-02-13 21:08:23 - INFO - calculate_summary_stats function called...
+
+2025-02-13 21:08:23 - ERROR - calculate_summary_stats failed with Unexpected error: 1146 (42S02): Table 'wind_turbine_db.wind_turbine_clean_data' doesn't exist
+2025-02-13 21:08:23 - ERROR - Failed to calculate_summary_stats, aborting...
+2025-02-13 21:08:23 - INFO - DB Connection closed.
+2025-02-13 21:08:23 - INFO - Summary Calculation- completed 
+

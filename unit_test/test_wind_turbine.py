@@ -15,12 +15,12 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(ROOT_DIR, "src"))
 
 import config  
-import ingest_data  
+import ingest_data
+import clean_data  
 
 # Mock DB table names
 MOCK_RAW_DATA_TABLE = 'mock_wind_turbine_raw_data'
 MOCK_INGESTION_TRACKER_TABLE = 'mock_wind_turbine_ingestion_tracker'
-
 file_path = os.path.join(ROOT_DIR, "mock_data", "raw", "mock_file.csv")
 
 @pytest.fixture
@@ -31,7 +31,11 @@ def mock_db_connection():
 
     mock_connection.cursor.return_value = mock_cursor
     mock_connection.__enter__.return_value = mock_connection
-    mock_connection.__exit__.return_value = None
+    
+    # for the `with` statement!
+    mock_cursor.__enter__.return_value = mock_cursor  
+    # Allow normal exit
+    mock_cursor.__exit__.return_value = None  
 
     return mock_connection, mock_cursor
 
@@ -136,13 +140,14 @@ def save_mock_data_to_csv(mock_csv_data):
 
 def test_mock_csv_creation(save_mock_data_to_csv):
     """Test to check if mock CSV file is created"""
-    assert os.path.exists(save_mock_data_to_csv), f"❌ File not found: {save_mock_data_to_csv}"
+    assert os.path.exists(save_mock_data_to_csv), f"File not found: {save_mock_data_to_csv}"
 
 
 def test_ingest_csv(mock_db_connection, save_mock_data_to_csv):
     """Test the ingest_csv function from ingest_data.py"""
     
-    mock_connection, mock_cursor = mock_db_connection  # Get mock DB connection
+    # Get mock DB connection
+    mock_connection, mock_cursor = mock_db_connection  
     file_path = save_mock_data_to_csv  # Get file path from fixture
     
     # Mock the behavior of `fetchone` to return a tuple (e.g., (1,))
@@ -160,7 +165,59 @@ def test_ingest_csv(mock_db_connection, save_mock_data_to_csv):
 
     print(f"Passed - {row_count} rows successfully inserted into {MOCK_RAW_DATA_TABLE}")
 
+def test_get_last_processed_info(mock_db_connection):
+    """Test the get_last_processed_info function."""
+    mock_connection, mock_cursor = mock_db_connection
+    file_name = "data_group_1.csv"
+    expected_result = ("2022-04-01 03:00:00")
 
+    # Explicitly mock the `fetchone` method to return the expected tuple
+    mock_cursor.fetchone.return_value = expected_result
+    # Ensure `execute()` is actually called inside `get_last_processed_info()`
+    mock_cursor.execute.assert_not_called() 
+
+    # Ensure execute() is called inside the function
+    result = ingest_data.get_last_processed_info(mock_connection, file_name)
+    print(f"result: {result}")
+
+    mock_cursor.execute.assert_called_once()  
+    assert result == expected_result, "Error: Unexpected function output!"
+
+def test_update_clean_table_success(mock_db_connection):
+    """Test update_clean_table when query executes successfully"""
+
+    mock_connection, mock_cursor = mock_db_connection
+
+    # Mock execute and commit methods
+    mock_cursor.execute.return_value = None  
+    mock_connection.commit.return_value = None  
+
+    # Call function
+    result = clean_data.update_clean_table(mock_connection)
+
+    # Assertions
+    # Ensure query executed
+    mock_cursor.execute.assert_called_once()  
+    # Ensure commit was called
+    mock_connection.commit.assert_called_once()  
+    assert result, "update_clean_table should return True on success"
+    
+
+def test_update_clean_table_failure(mock_db_connection):
+    """Test update_clean_table when query execution fails"""
+
+    mock_connection, mock_cursor = mock_db_connection
+
+    # Simulate an SQL execution error
+    mock_cursor.execute.side_effect = Exception("Database error!")
+
+    # Call function
+    result = clean_data.update_clean_table(mock_connection)
+
+    # Assertions
+    # Commit should NOT happen
+    mock_connection.commit.assert_not_called()  
+    assert not result, "update_clean_table should return False on failure"
 
 if __name__ == "__main__":
     pytest.main()

@@ -6,9 +6,11 @@ import logging
 
 # for mode calculation
 from scipy import stats
+from sqlalchemy import false
 import config as conf
 
 def get_max_timestamp_prev_run(connection, table_name):
+    logging.info(f"get_max_timestamp_prev_run function called....\n")
     # Fetch the maximum (latest) timestamp from the clean data table.
     try:
         with connection.cursor() as cursor:
@@ -18,12 +20,12 @@ def get_max_timestamp_prev_run(connection, table_name):
             return max_timestamp
         
     except Error as e:
-        print(f"Error fetching max timestamp: {e}")
+        #print(f"Error fetching max timestamp: {e}")
+        logging.error(f"Error fetching max timestamp: {e}")
         return None  
 
 def detect_and_store_anomalies(connection):
-    
-    logging.info(f"detect_and_store_anomalies function called")
+    logging.info(f"detect_and_store_anomalies function called....\n")
 
     """ Identify and store anomalies and store them in the anomalies table.
         anomalies : turbines whose output is outside of 2 standard deviations from the mean
@@ -45,13 +47,13 @@ def detect_and_store_anomalies(connection):
             check_clean_data_query = f"SHOW TABLES LIKE '{conf.CLEAN_DATA_TABLE}'"
             cursor.execute(check_clean_data_query)
             clean_data_exists = cursor.fetchone()  
-            print(f"clean data table exist: {clean_data_exists}\n")
+            #print(f"clean data table exist: {clean_data_exists}\n")
             if clean_data_exists: 
                 # Check whether clean table has data
                 check_empty_query = f"SELECT COUNT(*) FROM {conf.CLEAN_DATA_TABLE};"
                 cursor.execute(check_empty_query)
                 row_count = cursor.fetchone()[0]
-                print(f"clean data table row count: {row_count}\n")
+                #print(f"clean data table row count: {row_count}\n")
 
             if clean_data_exists and row_count > 0 :
                 query_stats = f"""
@@ -73,13 +75,13 @@ def detect_and_store_anomalies(connection):
             cursor.execute(query_stats)
             mean_power, std_power = cursor.fetchone()
 
-            print(f"mean_power: {mean_power} \n")
-            print(f"std_power: {std_power} \n")
+            #print(f"mean_power: {mean_power} \n")
+            #print(f"std_power: {std_power} \n")
             logging.info(f"mean_power: {mean_power}")
             logging.info(f"mean_power: {std_power}")
 
             if mean_power is None or std_power is None or std_power == 0:
-                print(f"No data available to compute anomalies or can not calculate it")
+                #print(f"No data available to compute anomalies or can not calculate it")
                 logging.warning(f"No data available to compute anomalies or can not calculate it")
                 return
 
@@ -94,8 +96,8 @@ def detect_and_store_anomalies(connection):
             lower_bound = mean_power - 2 * std_power
             upper_bound = mean_power + 2 * std_power    
 
-            print(f"lower_bound: {lower_bound} \n")
-            print(f"upper_bound: {upper_bound} \n")
+            #print(f"lower_bound: {lower_bound} \n")
+            #print(f"upper_bound: {upper_bound} \n")
             logging.info(f"lower_bound: {lower_bound}")
             logging.info(f"upper_bound: {upper_bound}")
 
@@ -148,18 +150,17 @@ def detect_and_store_anomalies(connection):
             
             connection.commit()
             
-            print(f"anomalies detected and stored successfully.")
+            #print(f"anomalies detected and stored successfully.")
             logging.info(f"anomalies detected and stored successfully.")
 
             return True
     except Error as e:
-        print(f"Error detecting anomalies: {e}\n")
+        #print(f"Error detecting anomalies: {e}\n")
         logging.error(f"Error detecting and storing anomalies: {e}")
         return False
 
 def get_filtered_data(connection, period_start):
-    
-    logging.info(f"get_filtered_data function called....")
+    logging.info(f"get_filtered_data function called....\n")
     
     """FUnction to fetch data from the raw table filtered by the given time period."""
     try:
@@ -170,19 +171,6 @@ def get_filtered_data(connection, period_start):
                 hence filtering NULLs on the raw data
                 Also, excluding anomalies to get more accurate data
             """
-
-            # query = f"""
-            #     SELECT wind_speed, wind_direction, power_output 
-            #         FROM {conf.RAW_DATA_TABLE} r
-            #     WHERE 
-            #         wind_speed IS NOT NULL 
-            #         AND wind_direction IS NOT NULL 
-            #         AND power_output IS NOT NULL
-            #         AND Not EXISTS (SELECT 1 FROM {conf.ANOMALIES_TABLE} a
-            #         WHERE a.timestamp = r.timestamp AND a.turbine_id = r.turbine_id)
-            #         --(timestamp, turbine_id) NOT IN (SELECT timestamp, turbine_id FROM {conf.ANOMALIES_TABLE})    
-            #     """
-            
             query = f"""
                 SELECT r.wind_speed, r.wind_direction, r.power_output
                 FROM {conf.RAW_DATA_TABLE} r
@@ -193,9 +181,9 @@ def get_filtered_data(connection, period_start):
                     AND r.power_output IS NOT NULL
                     AND a.timestamp IS NULL
                 """
-            # print(query)
+            # #print(query)
 
-            print(f"period_start: {period_start} \n")
+            #print(f"period_start: {period_start} \n")
             logging.info(f"period_start: {period_start}")
 
             if period_start:
@@ -211,19 +199,19 @@ def get_filtered_data(connection, period_start):
             return pd.DataFrame(filtered_data)
         
     except Error as e:
-        print(f"Error fetching filtered data from the raw data table: {e}")
+        #print(f"Error fetching filtered data from the raw data table: {e}")
         logging.error(f"Error fetching filtered data from the raw data table: {e}")
         # returning empty dataframe
         return pd.DataFrame() 
         
     except Exception as e:
-        print(f"get_filtered_data failed with Unexpected error: {e}")
+        #print(f"get_filtered_data failed with Unexpected error: {e}")
         logging.error(f"get_filtered_data failed with Unexpected error: {e}")
         # returning empty dataframe
         return pd.DataFrame()
 
 def calculate_statistics(df):
-    logging.info(f"calculate_statistics function called....")
+    logging.info(f"calculate_statistics function called....\n")
     
     # function to calculate stats.
     try:
@@ -251,7 +239,7 @@ def calculate_statistics(df):
         return stats_dict
     
     except Exception as e:
-        print(f"calculate_statistics failed with Unexpected error: {e}")
+        #print(f"calculate_statistics failed with Unexpected error: {e}")
         logging.error(f"calculate_statistics failed with Unexpected error: {e}")
         # returning empty dict
         return None
@@ -259,7 +247,7 @@ def calculate_statistics(df):
 
 def store_statistics(connection, period_name, stats_dict):
     
-    logging.info(f"store_statistics function called")
+    logging.info(f"store_statistics function called....\n")
 
     # Store calculated statistics in the database.
     
@@ -291,13 +279,15 @@ def store_statistics(connection, period_name, stats_dict):
             ))
             connection.commit()
         
+        return True
     except mysql.connector.Error as e:
-        print(f"Error inserting statistics: {e} \n")
+        #print(f"Error inserting statistics: {e} \n")
         logging.error(f"Error inserting statistics: {e}")
+        return False
 
 def process_statistics(connection):
     
-    logging.info(f"process_stat function called....")
+    logging.info(f"process_stat function called....\n")
 
     """Function to calculate and store statistics for different periods."""
     try:
@@ -305,7 +295,7 @@ def process_statistics(connection):
         max_timestamp = get_max_timestamp_prev_run(connection,conf.RAW_DATA_TABLE)
         
         if max_timestamp is None:
-            print("No data available for processing statistics.")
+            #print("No data available for processing statistics.")
             return
 
         """ 
@@ -322,10 +312,10 @@ def process_statistics(connection):
         }
 
         for period_name, period_start in periods.items():
-            print(f"Processing statistics for: {period_name}")
+            #print(f"Processing statistics for: {period_name}")
             
             # get the filtered data for the given period 
-            print(f"Getting the filtered data for : {period_name}")
+            #print(f"Getting the filtered data for : {period_name}")
             
             df = get_filtered_data(connection, period_start)
 
@@ -333,19 +323,19 @@ def process_statistics(connection):
                 stats_dict = calculate_statistics(df)
                 # Skip storing if stats_dict is None
                 if stats_dict is None:
-                    print(f"Skipping {period_name} due to empty stats.")
+                    #print(f"Skipping {period_name} due to empty stats.")
                     continue  
                 else:    
                     store_statistics(connection, period_name, stats_dict)
         return True            
                         
     except Error as e:
-        print(f"Error processing statistics: {e}")
+        #print(f"Error processing statistics: {e}")
         return False
 
 def update_clean_table(connection):
     
-    logging.info(f"update_clean_table function called....")
+    logging.info(f"update_clean_table function called....\n")
 
     """Create a clean data table by imputing missing values and removing outliers"""
     try:
@@ -399,31 +389,37 @@ def update_clean_table(connection):
             logging.info(f"update_clean_table query: {query}")
             cursor.execute(query)
             connection.commit()
-            print(f"Clean data updated successfully")
+            #print(f"Clean data updated successfully")
             logging.info(f"Clean data updated successfully")
 
         return True    
+    
     except Error as e:
-        print(f"Error updating clean table: {e}\n")
+        #print(f"Error updating clean table: {e}\n")
         logging.error(f"Error updating clean table: {e}")
+        return False
+    
+    except Exception as e:  
+        #print(f"General Error updating clean table: {e}\n")
+        logging.error(f"General Error updating clean table: {e}")
         return False
 
 def main():
     try:
         # connectint to the db and get db connection handle
-        logging.info(f"Wind Turbine - Data Cleaning Process Starts")
+        logging.info(f"Wind Turbine - Data Cleaning Process Starts \n")
         
         # get DB connection
-        print(f"Step 1 - get DB connection\n")
+        #print(f"Step 1 - get DB connection\n")
         logging.info(f"Step 1 - get DB connection")
         connection = conf.get_db_connection()
 
         if connection is None:
-            print(f"MySQL DB connection failed. \n")     
+            #print(f"MySQL DB connection failed. \n")     
             logging.error(f"MySQL DB Connection failed - check get_db_connection function in config.py")
-            return
+            return False
         else:
-            print(f"MySQL DB connection is successful. \n")     
+            #print(f"MySQL DB connection is successful. \n")     
             logging.info(f"MySQL DB connection is successful.")
             
         """ 
@@ -432,12 +428,12 @@ def main():
             standard deviations from the mean 
         """
 
-        print(f"Step 2 - Detect & Store anomalies \n")
+        #print(f"Step 2 - Detect & Store anomalies \n")
         logging.info(f"Step 2 - Detect & Store anomalies")
         if not detect_and_store_anomalies(connection):
-            print("Failed to identify and store anomalies, aborting...")
+            #print("Failed to identify and store anomalies, aborting...")
             logging.error("Failed to identify and store anomalies, aborting...")
-            return  
+            return False  
         
         """
             It is not clear which period should we use to fix the missing or outlier data, i.e. 
@@ -445,27 +441,27 @@ def main():
             2 weeks data or 1 week data or to that matter last day data.
             and hence collecting stats for all period and one of them can be used.
         """
-        print(f"Step 3 - Process Statistics i.e. process and store stats for different period \n")
+        #print(f"Step 3 - Process Statistics i.e. process and store stats for different period \n")
         logging.info(f"Step 3 - Process Statistics i.e. process and store stats for different period")
         if not process_statistics(connection):
-            print("Failed to process statistic, aborting...")
+            #print("Failed to process statistic, aborting...")
             logging.error("Failed to process statistic, aborting...")
-            return  
+            return False  
         
         # update clean table
-        print(f"Step 4 - Update clean data table for missing values and removing outliers")
+        #print(f"Step 4 - Update clean data table for missing values and removing outliers")
         logging.info(f"Step 4 - Update clean data table for missing values")
         if not update_clean_table(connection):
-            print("Failed to update clean data, aborting...")
+            #print("Failed to update clean data, aborting...")
             logging.error("Failed to update clean data, aborting...")
-            return  
+            return False  
         
         # we will call from Data Pipeline hence included return here.
         return True
     
     except Exception as e:  
         logging.error(f"Cleaning data process - Unexpected error occurred: {e}\n")
-        print(f"Cleaning data process - Unexpected error occurred: {e}")
+        #print(f"Cleaning data process - Unexpected error occurred: {e}")
         return
     finally:
         if connection:
@@ -473,4 +469,5 @@ def main():
             logging.info("DB Connection closed.") 
 
 if __name__ == "__main__":
-    main()
+    result = main() 
+    logging.info(f"Data Cleansing - completed \n")

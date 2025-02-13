@@ -17,10 +17,10 @@ def create_database(mysql_connection):
                 
                 if not result:
                     cursor.execute(f"CREATE DATABASE IF NOT EXISTS {conf.DB_NAME};")
-                    print(f"Database '{conf.DB_NAME}' created successfully.")
+                    #print(f"Database '{conf.DB_NAME}' created successfully.")
                     logging.info(f"Database '{conf.DB_NAME}' created successfully.")
                 else:
-                    print(f"Database '{conf.DB_NAME}' already exists.")
+                    #print(f"Database '{conf.DB_NAME}' already exists.")
                     logging.info(f"Database '{conf.DB_NAME}' already exists.")
 
                 mysql_connection.commit()
@@ -28,22 +28,22 @@ def create_database(mysql_connection):
         else:
             return False    
     except Error as e:
-        print(f"Error while creating MySQL {conf.DB_NAME} Database: {e}")
+        #print(f"Error while creating MySQL {conf.DB_NAME} Database: {e}")
         logging.error(f"Error while creating MySQL {conf.DB_NAME} Database: {e}")
         return False  
 
 # Function to create MySQL tables.
 def create_my_sql_table(connection, table_name, query):
-    # Create all MySQL tables as per the data model.
+    # Create all MySQL tables.
     try:
         with connection.cursor() as cursor:
             cursor.execute(query)
             connection.commit()
-            print(f"Table - {table_name} is either exist or created successfully \n")
+            #print(f"Table - {table_name} is either exist or created successfully \n")
             logging.info(f"Table - {table_name} is either exist or created successfully")   
             return True
     except Error as e:
-        print(f"Failed to create {table_name} table: {e} \n")
+        #print(f"Failed to create {table_name} table: {e} \n")
         logging.error(f"Failed to create {table_name} table: {e}")
         return False    
 
@@ -51,29 +51,29 @@ def create_my_sql_table(connection, table_name, query):
 def main():
     try:
 
-        # connectint to the db and get db connection handle
-        logging.info(f"Wind Turbine - Databse Setup Starts")
+        # connecting to the db and get db connection handle
+        logging.info(f"Wind Turbine - Databse Setup Starts \n")
         mysql_connection = conf.get_mysql_connection()
-        print(f" MySQL Connection {mysql_connection} \n")
+        #print(f" MySQL Connection {mysql_connection} \n")
         
         if mysql_connection is None:
-            print(f"MySQL connection failed.")     
-            logging.info(f"MySQL Connection failed - check mysql_connection function in config.py")
-            return
+            #print(f"MySQL connection failed.")     
+            logging.error(f"MySQL Connection failed - check mysql_connection function in config.py")
+            return 
         
         # Creating DB if not exist
         if not create_database(mysql_connection):
-            print("Failed to create database, aborting...\n")
+            #print("Failed to create database, aborting...\n")
             logging.error("Failed to create database, aborting...")
             return 
         
         # get DB connection
-        print(f"get DB connection\n")
+        #print(f"get DB connection\n")
         logging.info(f"get DB connection")
         connection = conf.get_db_connection()
 
         if connection is None:
-            print(f"MySQL DB connection failed. \n")     
+            #print(f"MySQL DB connection failed. \n")     
             logging.error(f"DB Connection failed - check get_db_connection function in config.py")
             return
         
@@ -163,21 +163,22 @@ def main():
 
         # Create Tables 
         for table_name, query in tables.items():
-            # print(table_name)
-            # print(query)
-            create_my_sql_table(connection, table_name, query)
-
+            # #print(table_name)
+            # #print(query)
+            if not create_my_sql_table(connection, table_name, query):
+                logging.error(f"Failed to create table {table_name}")
+                return False 
+        
+        return True
     except Exception as e:  
         logging.error(f"Database Setup - Unexpected error occurred: {e}\n")
-        print(f"Database Setup - Unexpected error occurred:: {e}")
+        #print(f"Database Setup - Unexpected error occurred:: {e}")
         return
     finally:
         if connection:
             connection.close()
             logging.info("DB Connection closed.") 
-            mysql_connection.close()
-            logging.info("MySQL Connection closed.") 
- 
+        
         if mysql_connection:
             mysql_connection.close()
             logging.info("DB mysql_connection closed.") 
@@ -185,4 +186,5 @@ def main():
 
 if __name__ == "__main__":
     #calling main()
-    main()
+    result = main()
+    logging.info(f"Database Setup - completed \n")

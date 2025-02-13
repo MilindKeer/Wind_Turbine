@@ -1,0 +1,20 @@
+2025-02-13 21:06:52 - INFO - Wind Turbine - calculate summary stats starts 
+
+2025-02-13 21:06:52 - INFO - Step 1 - get DB connection
+2025-02-13 21:06:53 - INFO - MySQL DB connection is successful.
+2025-02-13 21:06:53 - INFO - Step 2 - calculate summary stats
+2025-02-13 21:06:53 - INFO - calculate_summary_stats function called...
+
+2025-02-13 21:06:53 - INFO - Summary statistics updated successfully.
+2025-02-13 21:06:53 - INFO - calculate_summary_stats is successful
+2025-02-13 21:06:53 - INFO - get_anomalies_summary_stats function called...
+
+2025-02-13 21:06:53 - INFO - drop_and_create_summary_table function called....
+
+2025-02-13 21:06:53 - INFO - generate_summary_stats_query function called....
+
+2025-02-13 21:06:53 - INFO - Anomaly summary insertion successful.
+2025-02-13 21:06:53 - INFO - get_anomalies_summary_stats is successful
+2025-02-13 21:06:53 - INFO - DB Connection closed.
+2025-02-13 21:06:53 - INFO - Summary Calculation- completed 
+
