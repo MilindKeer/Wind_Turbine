@@ -56,8 +56,22 @@ You are a data engineer for a renewable energy company that operates a farm of w
 ---
 
 ## Solution Design
-- The solution is built using **Python (Pandas, MySQL) and SQL** in **VS Code**. 
-- The pipeline ensures scalability and efficiency by optimizing data ingestion and transformation.
+The solution is built using Python (with Pandas for data manipulation and MySQL for database management) and SQL in VS Code. 
+
+### Key Components:
+- **Data Ingestion**: The pipeline ingests wind turbine data, which is updated daily. It handles new and modified records by tracking processed data using a tracking table in **MySQL**.
+
+- **Data Cleaning**: The pipeline performs data validation by fixing missing and outlier values using calculated summary statistics (mean, median, and mode). Cleaned data is stored in a separate table for further processing.
+
+- **Summary Statistics Calculation**: The pipeline calculates summary statistics (minimum, maximum, and average power output) for each turbine on a daily basis, storing the results in a **MySQL** table for easy retrieval and analysis.
+
+- **Anomaly Detection**: The solution dynamically tracks anomalies by calculating and storing counts of anomalies per turbine. The database schema adjusts automatically to include columns for each turbine ID, accommodating a variable number of turbines.
+
+- **Scalability & Efficiency**: The solution is designed for scalability, efficiently handling data ingestion, transformation, and anomaly detection for an expanding dataset. The pipeline is dynamic, capable of adding new turbines or adjusting anomaly detection logic as needed.
+
+- **SQL Queries**: **Dynamic SQL** is used to create and update summary tables, ensuring the pipeline can accommodate changes in the dataset, such as adding new turbines or adjusting the logic for anomaly detection.
+
+
 
 
 ## Installation
