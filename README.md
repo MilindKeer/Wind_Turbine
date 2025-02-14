@@ -137,6 +137,22 @@ The folder structure of this project is as follows:
 
 ## **Detailed Workflow**
 
+### Database Setup (`setup_database.py`)
+
+This script ensures that the MySQL database and all required tables exist before running the data pipeline. It performs the following steps:
+- Establishes a MySQL connection.
+- Creates the database if it does not exist.
+- Connects to the created database.
+- Creates necessary tables, including:
+  - Raw Data Table (`wind_turbine_raw_data`)
+  - Ingestion Tracker Table (`wind_turbine_ingestion_tracker`)
+  - Clean Data Table (`wind_turbine_clean_data`)
+  - Anomalies Table (`wind_turbine_anomalies`)
+  - Mean, Median, Mode Table (`wind_turbine_mean_median_mode_stats`)
+  - Summary Statistics Table (`wind_turbine_summary_stats`)  
+
+If a table already exists, the script logs that it is present and continues execution.
+
 ### **Data Ingestion (`ingest_data.py`)**  
 - Reads all CSV files from `data/raw/` and loads them into the **Raw Data Table (`wind_turbine_raw_data`)**.  
 - The **Raw Data Table** acts as the **source of truth**, storing data exactly as it appears in the CSV files without modifications.  
